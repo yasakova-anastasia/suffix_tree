@@ -179,7 +179,7 @@ void OneToOneCode::BuildGraph(int search_method) {
                             && j + l + f[m].first.size() - 1
                                 < f[m].second.size()
                             && f[m].second[j + l + f[m].first.size() - 1]
-                                == f[m].first.size() - 1) {
+                                == static_cast<int>(f[m].first.size() - 1)) {
                             overlap[l].push_back(f[m].first);
                         }
                     }
@@ -193,7 +193,7 @@ void OneToOneCode::BuildGraph(int search_method) {
                 while (!stack.empty()) {
                     auto pair = stack.top();
                     stack.pop();
-                    if (pair.first == preproc.size()) {
+                    if (pair.first == static_cast<int>(preproc.size())) {
                         std::vector<std::string> tmp;
                         tmp.push_back(v1);
                         for (size_t l = 0; l < pair.second.size(); ++l) {
