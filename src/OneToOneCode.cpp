@@ -123,15 +123,15 @@ bool OneToOneCode::MarkovAlgorithm(int search_method) {
 }
 
 void OneToOneCode::VertexSearch() {
-    for (int i = 0; i < code.size(); ++i) {
+    for (size_t i = 0; i < code.size(); ++i) {
         if (code[i].size() > 1 && std::find(vertex.cbegin(),
                 vertex.cend(), code[i]) == vertex.cend()) {
-            for (int j = 0; j < code[i].size() - 1; ++j) {
+            for (size_t j = 0; j < code[i].size() - 1; ++j) {
                 std::string v1 = code[i].substr(0, j + 1);
                 if (std::find(vertex.cbegin(),
                         vertex.cend(), v1) == vertex.cend() &&
                     std::find(code.cbegin(), code.cend(), v1) == code.cend()) {
-                    for (int k = 0; k < code.size(); ++k) {
+                    for (size_t k = 0; k < code.size(); ++k) {
                         if (code[k].size() > v1.size()) {
                             std::string v2 = code[k].substr(code[k].size()
                                 - v1.size(), code[k].size());
@@ -149,7 +149,7 @@ void OneToOneCode::VertexSearch() {
 }
 
 void OneToOneCode::BuildGraph(int search_method) {
-    for (int i = 0; i < code.size(); ++i) {
+    for (size_t i = 0; i < code.size(); ++i) {
         overlap_str f;
         if (search_method == 0) {
             f = GetOverlapKMP(code[i]);
@@ -159,13 +159,13 @@ void OneToOneCode::BuildGraph(int search_method) {
             f = GetOverlapSTMK(code[i]);
         }
 
-        for (int j = 0; j < code[i].size(); ++j) {
+        for (size_t j = 0; j < code[i].size(); ++j) {
             std::string v1 = code[i].substr(0, j);
             if (std::find(vertex.cbegin(),
                     vertex.cend(), v1) == vertex.cend()) {
                 continue;
             }
-            for (int k = 0; k < code[i].size() - j + 1; ++k) {
+            for (size_t k = 0; k < code[i].size() - j + 1; ++k) {
                 std::string v2 = code[i].substr(code[i].size() - k, k);
                 if (std::find(vertex.cbegin(),
                         vertex.cend(), v2) == vertex.cend()) {
@@ -173,8 +173,8 @@ void OneToOneCode::BuildGraph(int search_method) {
                 }
                 std::string preproc = code[i].substr(j, code[i].size() - k - j);
                 std::vector<std::vector<std::string>> overlap(preproc.size());
-                for (int l = 0; l < preproc.size(); ++l) {
-                    for (int m = 0; m < f.size(); ++m) {
+                for (size_t l = 0; l < preproc.size(); ++l) {
+                    for (size_t m = 0; m < f.size(); ++m) {
                         if (preproc.size() - l >= f[m].first.size()
                             && j + l + f[m].first.size() - 1
                                 < f[m].second.size()
@@ -196,14 +196,14 @@ void OneToOneCode::BuildGraph(int search_method) {
                     if (pair.first == preproc.size()) {
                         std::vector<std::string> tmp;
                         tmp.push_back(v1);
-                        for (int l = 0; l < pair.second.size(); ++l) {
+                        for (size_t l = 0; l < pair.second.size(); ++l) {
                             tmp.push_back(pair.second[l]);
                         }
                         tmp.push_back(v2);
                         comb.push_back(tmp);
                         continue;
                     }
-                    for (int l = 0; l < overlap[pair.first].size(); ++l) {
+                    for (size_t l = 0; l < overlap[pair.first].size(); ++l) {
                         std::vector<std::string> v_ = pair.second;
                         v_.push_back(overlap[pair.first][l]);
                         stack.push(std::make_pair(pair.first +
@@ -219,7 +219,7 @@ overlap_str OneToOneCode::GetOverlapSTU(std::string str) {
     overlap_str overlap;
     SuffixTree st;
     bool isbuild = false;
-    for (int j = 0; j < code.size(); ++j) {
+    for (size_t j = 0; j < code.size(); ++j) {
         if (str.size() > code[j].size()) {
             if (!isbuild) {
                 st.construct_1(str + "$");
@@ -237,7 +237,7 @@ overlap_str OneToOneCode::GetOverlapSTMK(std::string str) {
     overlap_str overlap;
     SuffixTree st;
     bool isbuild = false;
-    for (int j = 0; j < code.size(); ++j) {
+    for (size_t j = 0; j < code.size(); ++j) {
         if (str.size() > code[j].size()) {
             if (!isbuild) {
                 st.construct_2(str + "$");
@@ -253,7 +253,7 @@ overlap_str OneToOneCode::GetOverlapSTMK(std::string str) {
 
 overlap_str OneToOneCode::GetOverlapKMP(std::string str) {
     overlap_str overlap;
-    for (int j = 0; j < code.size(); ++j) {
+    for (size_t j = 0; j < code.size(); ++j) {
         if (str.size() > code[j].size()) {
             overlap.push_back(std::make_pair(code[j], SFT_KMP(code[j], str)));
         }
@@ -266,7 +266,7 @@ bool OneToOneCode::IsCycle() {
     std::stack<std::string> stack;
     std::map<std::string, int> vertex_color;
     std::string res_ = "";
-    for (int i = 0; i < vertex.size(); ++i) {
+    for (size_t i = 0; i < vertex.size(); ++i) {
         vertex_color.insert(std::pair<std::string, int>(vertex[i], -1));
     }
 
@@ -284,7 +284,7 @@ bool OneToOneCode::IsCycle() {
                 break;
             }
         }
-        for (int j = 0; j < comb.size(); j++) {
+        for (size_t j = 0; j < comb.size(); j++) {
             if (curr_vertex == comb[j][0] && vertex_color[comb[j][2]] != 1) {
                 stack.push(comb[j][2]);
             }
@@ -295,7 +295,7 @@ bool OneToOneCode::IsCycle() {
 
 void OneToOneCode::ReBuildGraph() {
     std::vector<std::vector<std::string>> re_comb;
-    for (int i = 0; i < comb.size(); ++i) {
+    for (size_t i = 0; i < comb.size(); ++i) {
         if (comb[i].size() == 3) {
             if (comb[i][0] != comb[i][2])
                 re_comb.push_back(comb[i]);

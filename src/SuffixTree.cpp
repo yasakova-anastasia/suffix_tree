@@ -192,9 +192,7 @@ Node* SuffixTree::walkdown(Node* node, int& g_start, int& g_end, int& p) {
 
 Node* SuffixTree::jumpdown(Node* node, int& b_start, int& b_end) {
     Node* current = node;
-    int i = 0;
     while (b_start <= b_end) {
-        i = 0;
         int i = 0;
         Node* child = NULL;
         for (auto& item : current->children) {
@@ -302,7 +300,7 @@ std::string SuffixTree::log_node(Node* parent) {
 
 std::vector<int> SuffixTree::findsubstr(std::string str) {
     std::vector<int> f(tree_string.size(), -1);
-    int count = 0;
+    size_t count = 0;
     Node* curr = root;
     bool flag = true;
     std::string prev_str = "";
@@ -316,8 +314,8 @@ std::vector<int> SuffixTree::findsubstr(std::string str) {
                 Node* child = it->second;
                 std::string child_str = get_substr(child->begin_index,
                     *child->end_index);
-                int j = count;
-                for (int i = 0; i < std::min(str.size(),
+                size_t j = count;
+                for (size_t i = 0; i < std::min(str.size(),
                         child_str.size()); ++i) {
                     if (str[i + count] == child_str[i]) {
                         ++j;
@@ -362,10 +360,10 @@ std::vector<int> SuffixTree::findsubstr(std::string str) {
             }
         }
 
-        for (int i = 0; i < matching_str.size(); ++i) {
+        for (size_t i = 0; i < matching_str.size(); ++i) {
             int index = tree_string.size() - matching_str[i].size();
             int counter = 0;
-            for (int j = index; j < index + str.size(); ++j) {
+            for (size_t j = index; j < index + str.size(); ++j) {
                 f[j] = counter;
                 ++counter;
             }
