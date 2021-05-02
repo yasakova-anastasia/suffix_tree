@@ -52,7 +52,7 @@ enable_testing()
 
 target_link_libraries(${ProjectId} gtest gtest_main)
 
-add_test(UnitTests ${ProjectId})
+add_test(NAME ${ProjectId} COMMAND ${ProjectId})
 
 if( UNIX )
         foreach (SOURCE_FILE ${ALL_SOURCE_FILES})
