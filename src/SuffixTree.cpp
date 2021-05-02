@@ -1,14 +1,10 @@
 // Copyright 2021 Yasakova Anastasia
 
-#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <cstddef>
-#include <new>
-#include <cstdio>
 #include <stack>
 #include <utility>
 
@@ -270,8 +266,6 @@ std::string SuffixTree::log_tree() {
 }
 
 std::string SuffixTree::log_node(Node* parent) {
-    std::map<int, Node*>::iterator it = parent->children.begin();
-
     std::stringstream buffer;
 
     // Internal nodes (nodes with ID <= 0) are unlabelled points, leaves
@@ -279,7 +273,8 @@ std::string SuffixTree::log_node(Node* parent) {
     buffer << parent->ID << "[shape="
         << ((parent->ID <= 0) ? "point" : "plaintext") << "];\n";
 
-    for (; it != parent->children.end(); it++) {
+    for (auto it = parent->children.begin();
+            it != parent->children.end(); ++it) {
         // Child nodes are stored on the parent node in a map of integers
         // (it->first) to Node pointers (it->second).
         Node* child_node = it->second;
