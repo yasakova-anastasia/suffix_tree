@@ -9,9 +9,9 @@ class Node;
 class SuffixTree {
  public:
     SuffixTree();
-    void construct_1(std::string);
-    void construct_2(std::string);
-    std::string log_tree();
+    void construct_1(std::string); // Ukkonen's algorithm
+    void construct_2(std::string); // McCreight's algorithm
+    std::string log_tree(); // for suffix tree print
     char get_char_at_index(int) const;
     std::vector<int> findsubstr(std::string str);
 
@@ -22,8 +22,8 @@ class SuffixTree {
 
     enum Rule { RULE_2, RULE_3 };
 
-    Node* walkdown(Node*, int&, int&, int&);
-    Node* jumpdown(Node*, int&, int&);
+    Node* walkdown(Node*, int&, int&, int&); // for McCreight's algorithm
+    Node* jumpdown(Node*, int&, int&); // for McCreight's algorithm
 
     Suffix get_suffix(Node*, int, int);
 
@@ -35,3 +35,6 @@ class SuffixTree {
     int* current_end;
     Node* last_leaf_extension;
 };
+
+void GenerateTextAndWord(int n, int m,
+        std::string& text, std::string& word);

@@ -29,9 +29,6 @@ void SuffixTree::construct_1(std::string s) {
     for (int i = 1; i < length; i++) {
         Suffix previous_suffix(last_leaf_extension, *current_end);
 
-        // Increment the current_end pointer:
-        // this implicitly applies Rule 1 to all
-        // leaf edges in the tree.
         (*current_end)++;
 
         // Explicitly compute successive extensions
@@ -366,4 +363,17 @@ std::vector<int> SuffixTree::findsubstr(std::string str) {
     }
 
     return f;
+}
+
+void GenerateTextAndWord(int n, int m,
+        std::string& text, std::string& word) {
+    std::srand(24);
+    for (int i = 0; i < n; ++i) {
+        int tmp = std::rand() % 57 + 65;
+        text += static_cast<char>(tmp);
+    }
+    for (int i = 0; i < m; ++i) {
+        int tmp = std::rand() % 57 + 65;
+        word += static_cast<char>(tmp);
+    }
 }

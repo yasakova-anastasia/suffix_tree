@@ -1,6 +1,7 @@
 // Copyright 2021 Yasakova Anastasia
 
 #include <gtest/gtest.h>
+// #include <chrono>
 #include "OneToOneCode.h"
 
 TEST(TestOneToOneCode, Test_Vertex_Search) {
@@ -91,3 +92,28 @@ TEST(TestOneToOneCode, Test_with_ST_Ukkonen_and_ST_McCreight) {
 
     EXPECT_EQ(code.MarkovAlgorithm(1), code.MarkovAlgorithm(2));
 }
+
+/*TEST(TestOneToOneCode, Test_on_time) {
+    OneToOneCode code;
+    code.GenerateCode(50, 2);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    code.MarkovAlgorithm(0);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout <<"KMP algorithm:\t" <<
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    code.MarkovAlgorithm(1);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout <<"Ukkonen's algorithm:\t" <<
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    code.MarkovAlgorithm(2);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout <<"McCreight's algorithm:\t" <<
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+
+    EXPECT_TRUE(true);
+}*/
