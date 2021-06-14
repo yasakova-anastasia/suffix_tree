@@ -1,4 +1,4 @@
-// Copyright 2021 Yasakova Anastasia
+﻿// Copyright 2021 Yasakova Anastasia
 
 #include "OneToOneCode.h"
 #include "SuffixTree.h"
@@ -8,22 +8,82 @@
 #include <map>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
+#include <cmath>
 
-void OneToOneCode::GenerateCode(int code_number, int symbol_number) {
-    code.resize(code_number);
+
+void OneToOneCode::GenerateCode(int code_number, int symbol_number, int min, int max) {
+    alphabet_power = symbol_number;
     std::srand(24);
-    for (int i = 0; i < code_number; ++i) {
-        int count = std::rand() % 9 + 1;
+    while(code.size() < code_number) {
+        int count = std::rand() % (max - min + 1) + min;
         std::string str = "";
         for (int j = 0; j < count; ++j) {
             str += std::to_string(std::rand() % symbol_number);
         }
-        code[i] = str;
+        if (checking_for_matches(str) && Macmillan_inequality(str) <= 1) {
+            code.push_back(str);
+        }
     }
 }
 
-void OneToOneCode::SetCode(std::vector<std::string> code_) {
+void OneToOneCode::SetCode(std::vector<std::string> code_, int symbol_number) {
+    alphabet_power = symbol_number;
     code = code_;
+}
+
+void OneToOneCode::PrintCode() {
+    std::cout << "V = { ";
+    for (int i = 0; i < code.size(); ++i) {
+        if (i != 0) {
+            std::cout << ", ";
+        }
+        std::cout << code[i];
+    }
+    std::cout << " }" << std::endl << std::endl;
+}
+
+bool OneToOneCode::checking_for_matches(std::string str) {
+    for (int i = 0; i < code.size(); ++i) {
+        if (code[i] == str) {
+            return false;
+        }
+    }
+    return true;
+}
+
+float OneToOneCode::Macmillan_inequality(std::string str) {
+    float sum = 0.0;
+    for (int i = 0; i < code.size(); ++i) {
+        sum += pow(alphabet_power, (-1) * static_cast<int>(code[i].size()));
+    }
+    sum += pow(alphabet_power, (-1) * static_cast<int>(str.size()));
+    return sum;
+}
+
+float OneToOneCode::Macmillan_inequality() {
+    float sum = 0.0;
+    for (int i = 0; i < code.size(); ++i) {
+        sum += pow(alphabet_power, (-1) * static_cast<int>(code[i].size()));
+    };
+    return sum;
+}
+
+std::vector<int> OneToOneCode::SimpleAlg(std::string word, std::string text) {
+    int n = word.length(),
+        m = text.length();
+    std::vector <int> f(m, 0);
+    int s;
+    for (int i = 0; i < m; i++) {
+        s = 0;
+        while (word[s] == text[i + s] && s < n) {
+            s++;
+        }
+        if (s == n) {
+            f[i + n - 1] = n;
+        }
+    }
+    return f;
 }
 
 std::vector<int> OneToOneCode::KMP(std::string word) {
@@ -70,56 +130,30 @@ std::vector<int> OneToOneCode::SFT_KMP(std::string word, std::string text) {
         }
         i++;
     }
-    /*std::cout << "KMP: Count = " << count << std::endl;
-    std::cout << "fword\n";
-    for (int i = 0; i < fword.size(); ++i) {
-        std::cout << fword[i] << "  ";
-    }
-    std::cout << std::endl;
-    std::cout << "f\n";
-    for (int i = 0; i < f.size(); ++i) {
-        std::cout << f[i] << "  ";
-    }
-    std::cout << std::endl;*/
     return f;
 }
 
-bool OneToOneCode::MarkovAlgorithm(int search_method) {
+bool OneToOneCode::MarkovAlgorithm(int search_method, bool print) {
     VertexSearch();
-    /*std::cout << "VertexSearch\n";
-    for (int i = 0; i < vertex.size(); ++i) {
-        std::cout << vertex[i] << " ";
+    if (print) {
+        std::cout << "Graph vertices: S = { ";
+        for (int i = 0; i < vertex.size(); ++i) {
+            if (i != 0) {
+                std::cout << ", ";
+            }
+            if (vertex[i] == "") {
+                std::cout << "''";
+            } else {
+                std::cout << vertex[i];
+            }
+        }
+        std::cout << " }\n\n";
     }
-    std::cout << std::endl;*/
 
     BuildGraph(search_method);
-    /*std::cout << "Build_Graph\n";
-    for (int i = 0; i < comb.size(); ++i) {
-        for (int j = 0; j < comb[i].size(); ++j) {
-            if (comb[i][j] == "") {
-                std::cout << "'' ";
-            }
-            else {
-                std::cout << comb[i][j] << " ";
-            }
-        }
-        std::cout << std::endl;
-    }*/
     ReBuildGraph();
-    /*std::cout << "ReBuildGraph\n";
-    for (int i = 0; i < comb.size(); ++i) {
-        for (int j = 0; j < comb[i].size(); ++j) {
-            if (comb[i][j] == "") {
-                std::cout << "'' ";
-            }
-            else {
-                std::cout << comb[i][j] << " ";
-            }
-        }
-        std::cout << std::endl;
-    }*/
 
-    return !IsCycle();
+    return !IsCycle(print);
 }
 
 void OneToOneCode::VertexSearch() {
@@ -152,8 +186,10 @@ void OneToOneCode::BuildGraph(int search_method) {
     for (size_t i = 0; i < code.size(); ++i) {
         overlap_str f;
         if (search_method == 0) {
-            f = GetOverlapKMP(code[i]);
+            f = GetOverlap(code[i]);
         } else if (search_method == 1) {
+            f = GetOverlapKMP(code[i]);
+        } else if (search_method == 2) {
             f = GetOverlapSTU(code[i]);
         } else {
             f = GetOverlapSTMK(code[i]);
@@ -261,32 +297,79 @@ overlap_str OneToOneCode::GetOverlapKMP(std::string str) {
     return overlap;
 }
 
-bool OneToOneCode::IsCycle() {
+overlap_str OneToOneCode::GetOverlap(std::string str) {
+    overlap_str overlap;
+    for (size_t j = 0; j < code.size(); ++j) {
+        if (str.size() > code[j].size()) {
+            overlap.push_back(std::make_pair(code[j], SimpleAlg(code[j], str)));
+        }
+    }
+    return overlap;
+}
+
+bool OneToOneCode::IsCycle(bool print) {
     bool res = false;
-    std::stack<std::string> stack;
+    std::stack<std::string> stack_for_find, stack_for_cycle;
     std::map<std::string, int> vertex_color;
-    std::string res_ = "";
     for (size_t i = 0; i < vertex.size(); ++i) {
         vertex_color.insert(std::pair<std::string, int>(vertex[i], -1));
     }
 
-    stack.push("");
-    while (!stack.empty()) {
-        std::string curr_vertex = stack.top();
-        stack.pop();
+    stack_for_find.push("");
+    while (!stack_for_find.empty()) {
+        std::string curr_vertex = stack_for_find.top();
+        stack_for_find.pop();
         if (vertex_color[curr_vertex] == -1) {
             vertex_color[curr_vertex] = 0;
+            stack_for_cycle.push(curr_vertex);
         } else if (vertex_color[curr_vertex] == 0) {
             vertex_color[curr_vertex] = 1;
             if (curr_vertex == "") {
+                if (print) {
+                    std::vector<std::string> cycle;
+                    std::string prev = "";
+                    while (!stack_for_cycle.empty()) {
+                        std::string curr = stack_for_cycle.top();
+                        std::string edge = get_edge(curr, prev);
+                        if (edge != "$") {
+                            cycle.push_back(edge);
+                            if (curr != "") {
+                                cycle.push_back(curr);
+                            }
+                        }
+                        if (curr == "") {
+                            break;
+                        }
+                        prev = curr;
+                        stack_for_cycle.pop();
+                    }
+                    std::reverse(cycle.begin(), cycle.end());
+                    std::string str = "";
+                    std::cout << "Cycle: ";
+                    for (int i = 0; i < cycle.size(); ++i) {
+                        if (cycle[i] == "") {
+                            std::cout << "''  ";
+                        } else {
+                            std::cout << cycle[i] << "  ";
+                        }
+                        str += cycle[i];
+                    }
+                    std::cout << std::endl;
+                    std::vector<std::string> words = get_words(str);
+                    std::cout << "Possible combinations: " << std::endl;
+                    for (int i = 0; i < words.size(); ++i) {
+                        std::cout << "   " << words[i] << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
+                
                 res = true;
-                res_ = curr_vertex;
                 break;
             }
         }
         for (size_t j = 0; j < comb.size(); j++) {
             if (curr_vertex == comb[j][0] && vertex_color[comb[j][2]] != 1) {
-                stack.push(comb[j][2]);
+                stack_for_find.push(comb[j][2]);
             }
         }
     }
@@ -314,6 +397,57 @@ void OneToOneCode::ReBuildGraph() {
         }
     }
     comb = re_comb;
+}
+
+std::string OneToOneCode::get_edge(std::string v1, std::string v2) {
+    for (int i = 0; i < comb.size(); ++i) {
+        if (comb[i][0] == v1 && comb[i][2] == v2) {
+            return comb[i][1];
+        }
+    }
+    return "$";
+}
+
+std::vector<std::string> OneToOneCode::get_words(std::string str) {
+    std::vector<std::string> words;
+    overlap_str f = GetOverlapKMP(str);
+    std::vector<std::vector<std::string>> overlap(str.size());
+    for (size_t l = 0; l < str.size(); ++l) {
+        for (size_t m = 0; m < f.size(); ++m) {
+            if (str.size() - l >= f[m].first.size()
+                && l + f[m].first.size() - 1
+                < f[m].second.size()
+                && f[m].second[l + f[m].first.size() - 1]
+                == static_cast<int>(f[m].first.size() - 1)) {
+                overlap[l].push_back(f[m].first);
+            }
+        }
+    }
+    std::stack<std::pair<int, std::vector<std::string>>> stack;
+    std::vector<std::string> v_;
+    stack.push(std::make_pair(0, v_));
+    while (!stack.empty()) {
+        auto pair = stack.top();
+        stack.pop();
+        if (pair.first == static_cast<int>(str.size())) {
+            std::string tmp = "";
+            for (size_t l = 0; l < pair.second.size(); ++l) {
+                if (l != 0) {
+                    tmp += "  ";
+                }
+                tmp += pair.second[l];
+            }
+            words.push_back(tmp);
+            continue;
+        }
+        for (size_t l = 0; l < overlap[pair.first].size(); ++l) {
+            std::vector<std::string> v_ = pair.second;
+            v_.push_back(overlap[pair.first][l]);
+            stack.push(std::make_pair(pair.first +
+                overlap[pair.first][l].size(), v_));
+        }
+    }
+    return words;
 }
 
 std::vector<std::string> OneToOneCode::GetVertex() {

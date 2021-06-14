@@ -8,7 +8,7 @@ TEST(TestOneToOneCode, Test_Vertex_Search) {
     std::vector<std::string> target_vertex = { "0", "01", "10", "" };
     std::vector<std::string> words = { "1", "010", "101" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 2);
 
     code.VertexSearch();
     std::vector<std::string> vertex = code.GetVertex();
@@ -20,7 +20,7 @@ TEST(TestOneToOneCode, Test_with_KMP_1) {
     std::vector<std::string> words = { "10", "01", "12", "012",
                                        "2100", "12011", "12010" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 3);
 
     EXPECT_FALSE(code.MarkovAlgorithm(0));
 }
@@ -29,7 +29,7 @@ TEST(TestOneToOneCode, Test_with_ST_Ukkonen_1) {
     std::vector<std::string> words = { "10", "01", "12", "012",
                                        "2100", "12011", "12010" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 3);
 
     EXPECT_FALSE(code.MarkovAlgorithm(1));
 }
@@ -38,7 +38,7 @@ TEST(TestOneToOneCode, Test_with_ST_McCreight_1) {
     std::vector<std::string> words = { "10", "01", "12", "012",
                                        "2100", "12011", "12010" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 3);
 
     EXPECT_FALSE(code.MarkovAlgorithm(2));
 }
@@ -46,7 +46,7 @@ TEST(TestOneToOneCode, Test_with_ST_McCreight_1) {
 TEST(TestOneToOneCode, Test_with_KMP_2) {
     std::vector<std::string> words = { "1", "01", "100", "0100", "0000" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 2);
 
     EXPECT_TRUE(code.MarkovAlgorithm(0));
 }
@@ -54,7 +54,7 @@ TEST(TestOneToOneCode, Test_with_KMP_2) {
 TEST(TestOneToOneCode, Test_with_ST_Ukkonen_2) {
     std::vector<std::string> words = { "1", "01", "100", "0100", "0000" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 2);
 
     EXPECT_TRUE(code.MarkovAlgorithm(1));
 }
@@ -62,7 +62,7 @@ TEST(TestOneToOneCode, Test_with_ST_Ukkonen_2) {
 TEST(TestOneToOneCode, Test_with_ST_McCreight_2) {
     std::vector<std::string> words = { "1", "01", "100", "0100", "0000" };
     OneToOneCode code;
-    code.SetCode(words);
+    code.SetCode(words, 2);
 
     EXPECT_TRUE(code.MarkovAlgorithm(2));
 }
@@ -74,21 +74,21 @@ TEST(TestOneToOneCode, Test_with_ST_McCreight_2) {
 
 TEST(TestOneToOneCode, Test_with_KMP_and_ST_Ukkonen) {
     OneToOneCode code;
-    code.GenerateCode(10, 5);
+    code.GenerateCode(10, 5, 1, 5);
 
     EXPECT_EQ(code.MarkovAlgorithm(0), code.MarkovAlgorithm(1));
 }
 
 TEST(TestOneToOneCode, Test_with_KMP_and_ST_McCreight) {
     OneToOneCode code;
-    code.GenerateCode(10, 5);
+    code.GenerateCode(10, 5, 1, 5);
 
     EXPECT_EQ(code.MarkovAlgorithm(0), code.MarkovAlgorithm(2));
 }
 
 TEST(TestOneToOneCode, Test_with_ST_Ukkonen_and_ST_McCreight) {
     OneToOneCode code;
-    code.GenerateCode(10, 5);
+    code.GenerateCode(10, 5, 1, 5);
 
     EXPECT_EQ(code.MarkovAlgorithm(1), code.MarkovAlgorithm(2));
 }
